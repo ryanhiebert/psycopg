@@ -29,13 +29,13 @@ class StrBinaryDumper(_BaseStrDumper):
     format = Format.BINARY
     oid = postgres.types["text"].oid
 
-    def dump(self, obj: str) -> bytes:
+    def dump(self, obj: str) -> Optional[Buffer]:
         # the server will raise DataError subclass if the string contains 0x00
         return obj.encode(self._encoding)
 
 
 class _StrDumper(_BaseStrDumper):
-    def dump(self, obj: str) -> bytes:
+    def dump(self, obj: str) -> Optional[Buffer]:
         if "\x00" in obj:
             raise DataError("PostgreSQL text fields cannot contain NUL (0x00) bytes")
         else:
@@ -100,11 +100,13 @@ class BytesDumper(Dumper):
         super().__init__(cls, context)
         self._esc = Escaping(self.connection.pgconn if self.connection else None)
 
-    def dump(self, obj: bytes) -> Buffer:
+    def dump(self, obj: bytes) -> Optional[Buffer]:
         return self._esc.escape_bytea(obj)
 
-    def quote(self, obj: bytes) -> bytes:
+    def quote(self, obj: bytes) -> Buffer:
         escaped = self.dump(obj)
+        if escaped is None:
+            return b"NULL"
 
         # We cannot use the base quoting because escape_bytea already returns
         # the quotes content. if scs is off it will escape the backslashes in
@@ -134,7 +136,7 @@ class BytesBinaryDumper(Dumper):
     format = Format.BINARY
     oid = postgres.types["bytea"].oid
 
-    def dump(self, obj: Buffer) -> Buffer:
+    def dump(self, obj: Buffer) -> Optional[Buffer]:
         return obj
 
 
