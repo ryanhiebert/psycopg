@@ -19,7 +19,7 @@ cdef int CWAIT_W = Wait.W
 cdef int CWAIT_R = Wait.R
 cdef int CWAIT_RW = Wait.RW
 
-def connect_ng(conninfo: str) -> abc.PGconn:
+cpdef pq.PGconn connect_ng(conninfo: str):
     """
     Generator to create a database connection without blocking.
 
@@ -59,7 +59,7 @@ def connect_ng(conninfo: str) -> abc.PGconn:
     return conn
 
 
-def execute_ng(pq.PGconn pgconn) -> List[abc.PGresult]:
+cpdef list execute_ng(pq.PGconn pgconn):
     """
     Generator sending a query and returning results without blocking.
 
@@ -75,7 +75,7 @@ def execute_ng(pq.PGconn pgconn) -> List[abc.PGresult]:
     return rv
 
 
-def send_ng(pq.PGconn pgconn) -> None:
+cpdef send_ng(pq.PGconn pgconn):
     """
     Generator to send a query to the server without blocking.
 
@@ -105,7 +105,7 @@ def send_ng(pq.PGconn pgconn) -> None:
                     f"consuming input failed: {error_message(pgconn)}")
 
 
-def fetch_many_ng(pq.PGconn pgconn) -> List[PGresult]:
+cpdef list fetch_many_ng(pq.PGconn pgconn):
     """
     Generator retrieving results from the database without blocking.
 
@@ -146,7 +146,7 @@ def fetch_many_ng(pq.PGconn pgconn) -> List[PGresult]:
     return results
 
 
-def fetch_ng(pq.PGconn pgconn) -> Optional[PGresult]:
+cpdef object fetch_ng(pq.PGconn pgconn):
     """
     Generator retrieving a single result from the database without blocking.
 
@@ -183,9 +183,9 @@ def fetch_ng(pq.PGconn pgconn) -> Optional[PGresult]:
     return pq.PGresult._from_ptr(pgres)
 
 
-def pipeline_communicate_ng(
+cpdef list pipeline_communicate_ng(
     pq.PGconn pgconn, commands: Deque[PipelineCommand]
-) -> List[List[PGresult]]:
+):
     """Generator to send queries from a connection in pipeline mode while also
     receiving results.
 

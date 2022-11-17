@@ -27,6 +27,7 @@ cdef class PGconn:
     @staticmethod
     cdef PGconn _from_ptr(libpq.PGconn *ptr)
 
+    cpdef int flush(self)
     cpdef object notifies(self)
 
 
